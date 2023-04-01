@@ -5,6 +5,9 @@ import time
 import json
 import os
 import ast
+import pandas as pd
+import numpy as np
+from mlxtend.frequent_patterns import apriori
 
 if __name__ == '__main__':
     db_name = sys.argv[1]
@@ -135,7 +138,7 @@ def idea1(dbase, ms):
   for s in result:
     l = ast.literal_eval(s)
     db.append(l)
-  #print("DB LEN: ", db)
+  print("DB LEN: ", db)
 
   init_candidates(db, cands)
 
@@ -144,7 +147,6 @@ def idea1(dbase, ms):
     #print(f"{round=}")
 
     for i in range(size):
-
       if(round==1):
         pass
       else:
@@ -161,7 +163,7 @@ def idea1(dbase, ms):
       stop = check_stop_condition(cands)
       if stop:
         break
-    print("IDEA1 OUT: ",freqs)
+    #print("IDEA1 OUT: ",freqs)
   return round, freqs
 
 
@@ -180,9 +182,10 @@ total_length = 0
 temp = freq_dict.values()
 
 for sublist in temp:
-    for element in sublist:
-        total_length += 1
-print("LEN freq item: ", total_length)
+  for element in sublist:
+    total_length += 1
+    #print("REZA FREQ ELEMENT: ", element)
+print("REZA LEN freq item: ", total_length)
 
 
 with open("database/DB1K.txt", 'r') as f:
@@ -199,16 +202,14 @@ df = pd.get_dummies(df.apply(pd.Series).stack()).sum(level=0)
 
 li_frequent_itemsets = apriori(df, min_support=0.05, use_colnames=True)
 
-
-if len(li_frequent_itemsets['itemsets']) == total_length:
-  print("YOU LOST ! itemsets not matching with library output.")
-
 if total_length == len(li_frequent_itemsets["itemsets"]):
-  print("REZA ITEM: ", set(freq_dict.values()))
-  print("LIB ITEM: ", set(li_frequent_itemsets['itemsets']))
   if set(freq_dict.values()) == set(li_frequent_itemsets["itemsets"]):
     print("************* YOU WON :) ***************")
   else:
+    print("REZA ITEM: ", list(freq_dict.values()))
+    print("LIB ITEM: ", set(li_frequent_itemsets['itemsets']))
     print("*********** YOU LOST ! itemsets not matching with library output. *******************")
 else:
+  #print("REZA ITEM: ", set(list(freq_dict.values())))
+  #print("LIB ITEM: ", set(li_frequent_itemsets['itemsets']))
   print("****************** YOU LOST ! itemsets not matching with library output. *****************")
