@@ -115,8 +115,22 @@ def find_frequent_itemsets_partitioning(database, min_sup):
         support_count = count_support(itemset, data)
         if str(support_count) >= min_sup * len(data):
             frequent_itemsets.add(itemset)
+    
+    #Step 4: Validate Frequent Itemsets
+    df = pd.DataFrame(data)
+    df = pd.get_dummies(df.apply(pd.Series).stack()).sum(level=0)
+    min_sup = float(min_sup)
+    li_frequent_itemsets = apriori(df, min_support=min_sup, use_colnames=True)
+    if len(frequent_itemsets) == len(li_frequent_itemsets['itemsets']):
+        if set(frequent_itemsets) == set(li_frequent_itemsets['itemsets']):
+            print("YOU WON :)")
+        else:
+            print("YOU LOST ! itemsets not matching with library output.")
+    else:
+        print("YOU LOST ! itemsets not matching with library output.")
 
-    # Step 4: return frequent itemsets
+
+    # Step 5: return frequent itemsets
     return frequent_itemsets
 
 

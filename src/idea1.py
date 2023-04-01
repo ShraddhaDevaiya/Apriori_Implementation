@@ -182,4 +182,33 @@ temp = freq_dict.values()
 for sublist in temp:
     for element in sublist:
         total_length += 1
-print("LEN freq item: ", total_length)     
+print("LEN freq item: ", total_length)
+
+
+with open("database/DB1K.txt", 'r') as f:
+    lines = f.readlines()
+    result = [line.strip() for line in lines]
+    s_data= []
+
+for s in result:
+    l = ast.literal_eval(s)
+    s_data.append(l)
+
+df = pd.DataFrame(s_data)
+df = pd.get_dummies(df.apply(pd.Series).stack()).sum(level=0)
+
+li_frequent_itemsets = apriori(df, min_support=0.05, use_colnames=True)
+
+
+if len(li_frequent_itemsets['itemsets']) == total_length:
+  print("YOU LOST ! itemsets not matching with library output.")
+
+if total_length == len(li_frequent_itemsets["itemsets"]):
+  print("REZA ITEM: ", set(freq_dict.values()))
+  print("LIB ITEM: ", set(li_frequent_itemsets['itemsets']))
+  if set(freq_dict.values()) == set(li_frequent_itemsets["itemsets"]):
+    print("************* YOU WON :) ***************")
+  else:
+    print("*********** YOU LOST ! itemsets not matching with library output. *******************")
+else:
+  print("****************** YOU LOST ! itemsets not matching with library output. *****************")
