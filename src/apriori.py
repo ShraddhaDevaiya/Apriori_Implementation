@@ -6,6 +6,7 @@ import math
 import time
 import json
 import os
+import ast
 
 if __name__ == '__main__':
     db_name = sys.argv[1]
@@ -23,7 +24,16 @@ def save_apriori_outputs(freq_items, Filename,ms):
       fp.write("Frequent Item - %s\n" % freq_items)
 
 
-def sam_apriori(data, min_support):
+def sam_apriori(database, min_support):
+    with open(database, 'r') as f:
+        lines = f.readlines()
+        result = [line.strip() for line in lines]
+        data= []
+
+    for s in result:
+        l = ast.literal_eval(s)
+        data.append(l)
+    print("APRIORI LEN DB: ", len(data))
     unique_items = set()
     for row in data:
         for item in row:
@@ -97,7 +107,7 @@ def read_db_from_txtFile(file_name):
     # print the contents of the file
     #print(data)
     return data
-
+'''
 def remove_i_from_DB(db_lst):
   #return a db list exactly like what Generate_db funcitons returns
   res = []
@@ -106,10 +116,13 @@ def remove_i_from_DB(db_lst):
     for trans in db_lst:
       st += str(trans.replace("i",""))
   return st
+'''
 uncleaned_db = read_db_from_txtFile(db_name)
-final_db = remove_i_from_DB(uncleaned_db)
-freq_item_set = sam_apriori(final_db,ms)
+#final_db = remove_i_from_DB(uncleaned_db)
+final_db = uncleaned_db
+freq_item_set = sam_apriori("database/DB1K.txt",ms)
 print("DBG : ",freq_item_set)
+print("LEN FREQ ITEM : ",len(freq_item_set))
 
 output_file_name = "output_apriori.txt"
 save_apriori_outputs(freq_item_set,output_file_name,ms)

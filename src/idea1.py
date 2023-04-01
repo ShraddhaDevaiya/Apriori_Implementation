@@ -4,6 +4,8 @@ import math
 import time
 import json
 import os
+import ast
+
 if __name__ == '__main__':
     db_name = sys.argv[1]
     ms = sys.argv[2]
@@ -117,22 +119,23 @@ def read_db_from_txtFile(file_name):
     #print(data)
     return data
 
-def remove_i_from_DB(db_lst):
-  #return a db list exactly like what Generate_db funcitons returns
-  res = []
-  if db_lst is not None:
-    st = ""
-    for trans in db_lst:
-      st += str(trans.replace("i",""))
-  return st
-def idea1(db, ms):
-
-  size = len(db)
+def idea1(dbase, ms):
+  #print("DB LEN: ", dbase)
+  size = len(dbase)
   mf = math.ceil(int(size) * float(ms))
   cands = {}
   freqs = {}
   stop = False
   round = 0
+  with open(dbase, 'r') as f:
+    lines = f.readlines()
+    result = [line.strip() for line in lines]
+    db= []
+
+  for s in result:
+    l = ast.literal_eval(s)
+    db.append(l)
+  #print("DB LEN: ", db)
 
   init_candidates(db, cands)
 
@@ -158,15 +161,25 @@ def idea1(db, ms):
       stop = check_stop_condition(cands)
       if stop:
         break
-
+    print("IDEA1 OUT: ",freqs)
   return round, freqs
 
 
 uncleaned_db = read_db_from_txtFile(db_name)
-final_db = remove_i_from_DB(uncleaned_db)
-num_of_rounds , freq_dict = idea1(final_db,ms)
+#final_db = remove_i_from_DB(uncleaned_db)
+num_of_rounds , freq_dict = idea1("database/DB1K.txt",ms)
+
 
 ## Now you have to print the number of rounds as well as savign the resutls\
 
 output_file_name = "output_idea1.txt"
 save_idea1_outputs(freq_dict,num_of_rounds,output_file_name,ms)
+print("TYPE OF FREQUENT ITEM: ", len(freq_dict.values()))
+temp = []
+total_length = 0
+temp = freq_dict.values()
+
+for sublist in temp:
+    for element in sublist:
+        total_length += 1
+print("LEN freq item: ", total_length)     

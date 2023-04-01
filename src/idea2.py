@@ -121,12 +121,12 @@ def find_frequent_itemsets_partitioning(database, min_sup):
 
 
 def count_support(itemset, database):
+    #print("COUNT DB: ", itemset)
     # count the number of transactions in the database that contain the itemset
     count = 0
     for transaction in database:
         if itemset.issubset(transaction):
             count += 1
-
     return count
 
 def read_db_from_txtFile(file_name):
@@ -185,7 +185,7 @@ for frozenset_item in freq_item_set:
     sets_list.append(set(frozenset_item))
 sorted_sets_list = sorted(sets_list, key=list)
 print("DBG: ",len(sorted_sets_list))
-print("DBG: ",sorted_sets_list)
+#print("DBG: ",sorted_sets_list)
 #validate_itemsets(li_frequent_itemsets['itemsets'], sorted_sets_list)
 
 output_file_name = "output_idea2.txt"
