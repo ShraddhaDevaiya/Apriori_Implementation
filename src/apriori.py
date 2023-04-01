@@ -7,28 +7,30 @@ import time
 import json
 import os
 import ast
+from mlxtend.frequent_patterns import apriori
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     db_name = sys.argv[1]
     ms = sys.argv[2]
 
-def save_apriori_outputs(freq_items, Filename,ms):
-  # Create the "output" folder if it doesn't exist
-  if not os.path.exists("output"):
-    os.mkdir("output")
-  # Create the file inside the "output" folder
-  filename = os.path.join("output", Filename)
 
-  with open(filename, "w") as fp:
-      fp.write("Min Support - %s\n" % ms)
-      fp.write("Frequent Item - %s\n" % freq_items)
+def save_apriori_outputs(freq_items, Filename, ms):
+    # Create the "output" folder if it doesn't exist
+    if not os.path.exists("output"):
+        os.mkdir("output")
+    # Create the file inside the "output" folder
+    filename = os.path.join("output", Filename)
+
+    with open(filename, "w") as fp:
+        fp.write("Min Support - %s\n" % ms)
+        fp.write("Frequent Item - %s\n" % freq_items)
 
 
 def sam_apriori(database, min_support):
-    with open(database, 'r') as f:
+    with open(database, "r") as f:
         lines = f.readlines()
         result = [line.strip() for line in lines]
-        data= []
+        data = []
 
     for s in result:
         l = ast.literal_eval(s)
@@ -92,22 +94,43 @@ def sam_apriori(database, min_support):
     # for itemset in final_frequent_itemsets:
     #     support = (df[list(itemset)].sum(axis=1) == len(itemset)).sum() / len(df)
     #     print(itemset, support)
+
+    # Step : Validate Frequent Itemsets
+    df = pd.DataFrame(data)
+    df = pd.get_dummies(df.apply(pd.Series).stack()).sum(level=0)
+    li_frequent_itemsets = apriori(df, min_support=0.05, use_colnames=True)
+    if len(final_frequent_itemsets) == len(li_frequent_itemsets["itemsets"]):
+        # print("SAM ITEM: ", set(final_frequent_itemsets))
+        # print("LIB ITEM: ", set(li_frequent_itemsets['itemsets']))
+        if set(final_frequent_itemsets) == set(li_frequent_itemsets["itemsets"]):
+            print("************* YOU WON :) ***************")
+        else:
+            print(
+                "*********** YOU LOST ! itemsets not matching with library output. *******************"
+            )
+    else:
+        print(
+            "****************** YOU LOST ! itemsets not matching with library output. *****************"
+        )
+
     return final_frequent_itemsets
 
 
 def read_db_from_txtFile(file_name):
-  # example for filename: "db1K.txt"
-  # By default address is "../dbs/"
-  # return bd_list which later will be passed to remove_i_from_DB function
-  # open the text file in read mode
-  filename = os.path.join("database", str(file_name) + '.txt')
-  with open(filename, 'r') as f:
-    # read the contents of the file into a string
-    data = f.read()
-    # print the contents of the file
-    #print(data)
-    return data
-'''
+    # example for filename: "db1K.txt"
+    # By default address is "../dbs/"
+    # return bd_list which later will be passed to remove_i_from_DB function
+    # open the text file in read mode
+    filename = os.path.join("database", str(file_name) + ".txt")
+    with open(filename, "r") as f:
+        # read the contents of the file into a string
+        data = f.read()
+        # print the contents of the file
+        # print(data)
+        return data
+
+
+"""
 def remove_i_from_DB(db_lst):
   #return a db list exactly like what Generate_db funcitons returns
   res = []
@@ -116,13 +139,13 @@ def remove_i_from_DB(db_lst):
     for trans in db_lst:
       st += str(trans.replace("i",""))
   return st
-'''
+"""
 uncleaned_db = read_db_from_txtFile(db_name)
-#final_db = remove_i_from_DB(uncleaned_db)
+# final_db = remove_i_from_DB(uncleaned_db)
 final_db = uncleaned_db
-freq_item_set = sam_apriori("database/DB1K.txt",ms)
-print("DBG : ",freq_item_set)
-print("LEN FREQ ITEM : ",len(freq_item_set))
+freq_item_set = sam_apriori("database/DB1K.txt", ms)
+print("DBG : ", freq_item_set)
+print("LEN FREQ ITEM : ", len(freq_item_set))
 
 output_file_name = "output_apriori.txt"
-save_apriori_outputs(freq_item_set,output_file_name,ms)
+save_apriori_outputs(freq_item_set, output_file_name, ms)
