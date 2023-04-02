@@ -19,7 +19,7 @@ idea1:
 	$(PYTHON) src/idea1.py $(DATABASE) $(MS)
 
 idea2:
-	$(PYTHON) src/idea2.py $(DATABASE) $(MS)
+	$(PYTHON) src/idea2.py $(DATABASE) $(MS) $(PART_SIZE)
 
 make:
 	$(PYTHON) setup.py build bdist_wheel
